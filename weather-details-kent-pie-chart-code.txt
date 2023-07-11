@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        .arc text {
+            font: 10px sans-serif;
+            text-anchor: middle;
+        }
+
+        .arc path {
+            stroke: #fff;
+        }
+
+        .title {
+            fill: teal;
+            font-weight: bold;
+        }
+    </style>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+</head>
+<h1 font="Times New Roman" size="20" font-align="centre">WEATHER DETAILS FROM APRIL 16th TO APRIL 30</h1>
+<body>
+    <svg width="500" height="400"></svg>
+    <script>
+
+        var svg = d3.select("svg"),
+            width = svg.attr("width"),
+            height = svg.attr("height"),
+            radius = Math.min(width, height) / 2;
+        
+        var g = svg.append("g")
+                   .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+
+        var color = d3.scaleOrdinal(['#4daf4a','#377eb8','#ff7f00','#984ea3','#e41a1c','#624aaf','#a7bf86','#e84865','#5e5f63','#d6850b','#097a96','#d4d420','#3cde51','#a66d70','#ed1372']);
+
+        var pie = d3.pie().value(function(d) { 
+                return d.Temp; 
+            });
+
+        var path = d3.arc()
+                     .outerRadius(radius - 20)
+                     .innerRadius(0);
+
+        var label = d3.arc()
+                      .outerRadius(radius)
+                      .innerRadius(radius - 90);
+
+        d3.csv("kentdata.csv", function(error, data) {
+            if (error) {
+                throw error;
+            }
+            var arc = g.selectAll(".arc")
+                       .data(pie(data))
+                       .enter().append("g")
+                       .attr("class", "arc");
+
+            arc.append("path")
+               .attr("d", path)
+               .attr("fill", function(d) { return color(d.data.Date); });
+        
+            console.log(arc)
+        
+            arc.append("text")
+               .attr("transform", function(d) { 
+                        return "translate(" + label.centroid(d) + ")"; 
+                })
+               .text(function(d) { return d.data.Date; });
+            });
+
+            svg.append("g")
+               .attr("transform", "translate(" + (width / 1 - 450) + "," + 11 + ")")
+               .append("text")
+               
+               .attr("class", "title")
+    </script>
+</body>
+</html>
